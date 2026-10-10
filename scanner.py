@@ -183,7 +183,7 @@ def build_alert(mint, result):
     axiom_url = "https://axiom.trade/"
 
     return (
-        f"SOLANA CANDIDATE — {result['score']}/100 MARKET SCORE\n\n"
+        f"{'EARLY WATCH' if result['score'] < 80 else 'SOLANA CANDIDATE'} — {result['score']}/100 MARKET SCORE\n\n"
         f"Token: {name} ({symbol})\n"
         f"Mint: {mint}\n"
         f"Pool age: {result['age']:.0f} minutes\n"
