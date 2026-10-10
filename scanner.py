@@ -81,20 +81,29 @@ def send_telegram(message):
 
 
 def get_solana_profiles():
-    data = get_json(f"{DEX}/token-profiles/latest/v1")
-    if not isinstance(data, list):
-        return []
-
+    feeds = [
+        "/token-profiles/latest/v1",
+        "/token-boosts/latest/v1",
+        "/token-boosts/top/v1",
+        "/community-takeovers/latest/v1",
+    ]
     profiles = []
-    for item in data:
-        if item.get("chainId") != "solana":
-            continue
-        address = item.get("tokenAddress", "")
-        if address:
-            profiles.append(address)
-
-    # Remove duplicate mint addresses.
-    return list(dict.fromkeys(profiles))[:40]
+    for endpoint in feeds:
+        try:
+            data = get_json(f"{DEX}{endpoint}")
+            if not isinstance(data, list):
+                continue
+            for item in data:
+                if item.get("chainId") != "solana":
+                    continue
+                address = item.get("tokenAddress", "")
+                if address:
+                    profiles.append(address)
+        except Exception as exc:
+            print(f"Discovery feed failed ({endpoint}): {type(exc).__name__}")
+    unique_profiles = list(dict.fromkeys(profiles))
+    print(f"Discovery feeds returned {len(unique_profiles)} unique Solana tokens.")
+    return unique_profiles[:80]
 
 
 def get_pairs(mint):
